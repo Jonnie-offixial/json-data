@@ -1,20 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Admission Data Visualization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-  <h1>JSON WORK FOR MAKERERE UNIVERSITY</h1>
-  <script>
-       // fetching the JSON data
-         fetch('data.json')
-           .then(Response => Response.json ())// Parse the json
-           .then(data => {
-            console.log(data);
-           })
-            .catch(error => console.error('Error loading json:' ,error));
-  </script>
+<body class="bg-green-900 p-8">
+    <div class="text-center font-serif font-bold rounded-sm shadow-md">
+        <h1 class="text-3xl font-bold text-center text-white-800 hover:text-red-600 transition duration-300">STUDENTS ADMISSION DATA VISUALIZATION</h1>
+    </div>
+    <div id="chartContainer" class="max-w-3xl mx-auto mt-10 bg-white shadow-md rounded-lg p-6 hover:bg-gray-100 transition duration-300">
+        <canvas id="admissionChart" class="w-full"></canvas>
+        <p class="text-center text-gray-600 mt-4">
+            This chart visualizes gender distribution among admitted students.
+        </p>
+    </div>
+    <div id="chartContainer" class="max-w-3xl mx-auto mt-10 bg-white shadow-md rounded-lg p-6 hover:bg-gray-100 transition duration-300">
+        <canvas id="districtchart" class="w-full"></canvas>
+        <p class="text-center text-gray-600 mt-4">
+            This chart visualizes the students per district.
+        </p>
+    </div>
+    <div id="chartContainer" class="max-w-3xl mx-auto mt-10 bg-white shadow-md rounded-lg p-6 hover:bg-gray-100 transition duration-300">
+        <canvas id="trends" class="w-full"></canvas>
+        <p class="text-center text-gray-600 mt-4">
+            This chart visualizes the admission trends over the years.
+        </p> 
+    </div>
+    <div id="chartContainer" class="max-w-3xl mx-auto mt-10 bg-white shadow-md rounded-lg p-6 hover:bg-gray-100 transition duration-300">
+        <canvas id="popularity" class="w-full"></canvas>
+        <p class="text-center text-gray-600 mt-4">
+            This chart visualizes the popular course.
+        </p> 
+    </div>
+    <div class="font-serif pt-5 text-red-200 pl-20">
+        <h2 class="font-bold text-xl hover:text-red-400 transition duration-300">CHALLENGES FACED AND THEIR SOLUTIONS</h2>
+        <ul class="list-disc pl-5">
+            <li>Graphs and charts must be responsive to fit well on different screen sizes. Use media queries to adjust the chart's container size for different screen resolutions.</li>
+            <li>Graphs with large datasets slow down leading to poor performance. Use data aggregation techniques to reduce the number of data points plotted.</li>
+            <li>Ensuring that graphs render consistently across different browsers can be difficult. Test graphs on different devices and browsers and use polyfills.</li>
+        </ul>
+        <h3 class="font-bold text-lg hover:text-red-400 transition duration-300">INSIGHTS</h3>
+        <ul class="list-disc pl-5">
+            <li>Pie chart: It shows how parts of a whole compare. Each slice represents a program, and the size of the slice indicates the proportion of the total number of students doing that course.</li>
+        </ul>
+    </div>
+    <footer class="text-center text-gray-500 mt-10">
+        &copy; 2024 Student Admission Data Visualization By SSEBAYIGGA JOHN. All rights reserved.
+    </footer>
+    <script>
+        const jsonUrl = 'https://jonnie-offixial.github.io/json-data/data.json'
+        fetch(jsonUrl)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                visualizeData(data);
+                visualizeDataDistrict(data);
+                visualizeDatatrends(data);
+                visualizeDatapopularity(data);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+        function visualizeData(data) {
+            const allStudents = data.admissionData.pages.flatMap(page => page.students);
+            const genderCounts = allStudents.reduce((counts, student) => {
+                counts[student.gender] = (counts[student.gender] || 0) + 1;
+                return counts;
+            }, {});
+            const genders = Object.keys(genderCounts);
+            const counts = Object.values(genderCounts);
+            const ctx = document.getElementById('admissionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: genders,
+                    datasets: [{
+                        label: 'Gender Distribution',
+                        data: counts,
+                        backgroundColor: ['#4CAF5F', '#FFF722', '#2196F3', '#FFC107', '#9C27B0', '#89f543', '#gg45dd', '#4fff40', '#f0359f'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+
+        function visualizeDataDistrict(data) {
+            const allStudents = data.admissionData.pages.flatMap(page => page.students);
+            const districtCounts = allStudents.reduce((counts, student) => {
+                counts[student.districtName] = (counts[student.districtName] || 0) + 1;
+                return counts;
+            }, {});
+            const districtName = Object.keys(districtCounts);
+            const counts = Object.values(districtCounts);
+            const ctx = document.getElementById('districtchart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: districtName,
+                    datasets: [{
+                        label: 'Students Per District',
+                        data: counts,
+                        backgroundColor: ['#4CAF50', '#FF5722', '#2196F3', '#FFC107', '#9C27B0', '#4CAF50', '#FF5722', '#2196F3', '#FFC107', '#9C27B0', '#89f543', '#gg45dd', '#4fff40', '#f0359f'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+
+        function visualizeDatatrends(data) {
+            const allStudents = data.admissionData.pages.flatMap(page => page.students);
+            const trendCounts = allStudents.reduce((counts, student) => {
+                counts[student.year] = (counts[student.year] || 0) + 1;
+                return counts;
+            }, {});
+            const year = Object.keys(trendCounts);
+            const counts = Object.values(trendCounts);
+            const ctx = document.getElementById('trends').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: year,
+                    datasets: [{
+                        label: 'Admission Trends Over Years',
+                        data: counts,
+                        backgroundColor: ['#4CAF50', '#FF5722', '#2196F3', '#FFC107', '#9C27B0', '#4CAF50', '#FF5722', '#2196F3', '#FFC107', '#9C27B0', '#89f543', '#gg45dd', '#4fff40', '#f0359f'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+
+        function visualizeDatapopularity(data) {
+            const allStudents = data.admissionData.pages.flatMap(page => page.students);
+            const popularityCounts = allStudents.reduce((counts, student) => {
+                counts[student.course] = (counts[student.course] || 0) + 1;
+                return counts;
+            }, {});
+            const course = Object.keys(popularityCounts);
+            const counts = Object.values(popularityCounts);
+            const ctx = document.getElementById('popularity').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: course,
+                    datasets: [{
+                        label: 'Popular Course Over The Years',
+                        data: counts,
+                        backgroundColor: ['#4CAF50', '#FF5722', '#2196F3', '#FFC107', '#9C27B0', '#4CAF50', '#FF5722', '#2196F3', '#FFC107', '#9C27B0', '#89f543', '#gg45dd', '#4fff40', '#f0359f'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
-</html> 
+</html>
